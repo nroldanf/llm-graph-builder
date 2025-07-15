@@ -18,7 +18,11 @@ Follow these steps to set up and run the project locally:
 
 2. Install Dependency :
 
-> pip install -t requirements.txt
+```bash
+uv venv
+uv sync
+source .venv/bin/activate
+```
 
 ## Run backend project using unicorn
 Run the server:
