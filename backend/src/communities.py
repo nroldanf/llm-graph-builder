@@ -14,7 +14,9 @@ NODE_PROJECTION_ENTITY = "__Entity__"
 MAX_WORKERS = 10
 MAX_COMMUNITY_LEVELS = 3 
 MIN_COMMUNITY_SIZE = 1 
-COMMUNITY_CREATION_DEFAULT_MODEL = "openai_gpt_4o"
+# TODO: Hardcoded
+COMMUNITY_CREATION_DEFAULT_MODEL = "bedrock_claude_3_7_sonnet"
+print(f"COMMUNITY_CREATION_DEFAULT_MODEL: {COMMUNITY_CREATION_DEFAULT_MODEL}")
 
 
 CREATE_COMMUNITY_GRAPH_PROJECTION = """
@@ -252,7 +254,10 @@ def get_community_chain(model, is_parent=False,community_template=COMMUNITY_TEMP
         if is_parent:
             community_template=PARENT_COMMUNITY_TEMPLATE
             system_template= PARENT_COMMUNITY_SYSTEM_TEMPLATE
+        print(f"MY MODEL NAME: {model}")
         llm, model_name = get_llm(model)
+        print(f"MY LLM: {llm}")
+        print(f"MY MODEL NAME: {model_name}")
         community_prompt = ChatPromptTemplate.from_messages(
             [
                 (

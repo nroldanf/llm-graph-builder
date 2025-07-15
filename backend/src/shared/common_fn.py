@@ -82,7 +82,8 @@ def load_embedding_model(embedding_model_name: str):
         logging.info(f"Embedding: Using Vertex AI Embeddings , Dimension:{dimension}")
     elif embedding_model_name == "titan":
         embeddings = get_bedrock_embeddings()
-        dimension = 1536
+        # dimension = 1536
+        dimension = 1024
         logging.info(f"Embedding: Using bedrock titan Embeddings , Dimension:{dimension}")
     else:
         embeddings = HuggingFaceEmbeddings(
@@ -182,21 +183,29 @@ def get_bedrock_embeddings():
        env_value = os.getenv("BEDROCK_EMBEDDING_MODEL")
        if not env_value:
            raise ValueError("Environment variable 'BEDROCK_EMBEDDING_MODEL' is not set.")
-       try:
-           model_name, aws_access_key, aws_secret_key, region_name = env_value.split(",")
-       except ValueError:
-           raise ValueError(
-               "Environment variable 'BEDROCK_EMBEDDING_MODEL' is improperly formatted. "
-               "Expected format: 'model_name,aws_access_key,aws_secret_key,region_name'."
-           )
-       bedrock_client = boto3.client(
+      #  try:
+      #      model_name, aws_access_key, aws_secret_key, region_name = env_value.split(",")
+      #  except ValueError:
+      #      raise ValueError(
+      #          "Environment variable 'BEDROCK_EMBEDDING_MODEL' is improperly formatted. "
+      #          "Expected format: 'model_name,aws_access_key,aws_secret_key,region_name'."
+      #      )
+       model_name = os.getenv("BEDROCK_EMBEDDING_MODEL", "amazon.titan-embed-text-v2:0")  # Default to titan if not set
+       session = boto3.session.Session(
+         profile_name=os.getenv("AWS_PROFILE_NAME"), 
+         region_name=os.getenv("AWS_REGION_NAME", "us-east-2"),
+       )
+       bedrock_client = session.client(
                service_name="bedrock-runtime",
-               region_name=region_name.strip(),
-               aws_access_key_id=aws_access_key.strip(),
-               aws_secret_access_key=aws_secret_key.strip(),
+              #  region_name=region_name.strip(),
+              #  region_name=os.getenv("AWS_REGION_NAME", "us-east-2"),  # Use AWS_REGION_NAME if set, default to us-east-1
+              #  aws_profile_name=os.getenv("AWS_PROFILE_NAME"),  # Use AWS_PROFILE if set
+              #  aws_access_key_id=aws_access_key.strip(),
+              #  aws_secret_access_key=aws_secret_key.strip(),
            )
        bedrock_embeddings = BedrockEmbeddings(
-           model_id=model_name.strip(),
+          #  model_id=model_name.strip(),
+           model_id=model_name,
            client=bedrock_client
        )
        return bedrock_embeddings

@@ -88,12 +88,16 @@ def get_llm(model: str):
             llm = ChatGroq(api_key=api_key, model_name=model_name, temperature=0)
 
         elif "bedrock" in model:
-            model_name, aws_access_key, aws_secret_key, region_name = env_value.split(",")
-            bedrock_client = boto3.client(
+            model_name, _, _, region_name = env_value.split(",")
+            # model_name = os.getenv("BEDROCK_MODEL_NAME")  # Default to titan if not set
+            session = boto3.session.Session(
+                profile_name=os.getenv("AWS_PROFILE_NAME"), 
+            )
+            bedrock_client = session.client(
                 service_name="bedrock-runtime",
-                region_name=region_name,
-                aws_access_key_id=aws_access_key,
-                aws_secret_access_key=aws_secret_key,
+                # region_name=region_name,
+                # aws_access_key_id=aws_access_key,
+                # aws_secret_access_key=aws_secret_key,
             )
 
             llm = ChatBedrock(
