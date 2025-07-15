@@ -14,7 +14,8 @@ import time
 from pathlib import Path
 from urllib.parse import urlparse
 import boto3
-from langchain_community.embeddings import BedrockEmbeddings
+# from langchain_community.embeddings import BedrockEmbeddings
+from langchain_aws.embeddings.bedrock import BedrockEmbeddings
 
 def check_url_source(source_type, yt_url:str=None, wiki_query:str=None):
     language=''

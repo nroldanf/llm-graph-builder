@@ -5,8 +5,10 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser 
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import os
+from dotenv import load_dotenv
 from src.shared.common_fn import load_embedding_model
 
+load_dotenv(override=True)
 
 COMMUNITY_PROJECTION_NAME = "communities"
 NODE_PROJECTION = "!Chunk&!Document&!__Community__"
@@ -14,8 +16,8 @@ NODE_PROJECTION_ENTITY = "__Entity__"
 MAX_WORKERS = 10
 MAX_COMMUNITY_LEVELS = 3 
 MIN_COMMUNITY_SIZE = 1 
-# TODO: Hardcoded
-COMMUNITY_CREATION_DEFAULT_MODEL = "bedrock_claude_3_7_sonnet"
+
+COMMUNITY_CREATION_DEFAULT_MODEL = os.getenv("COMMUNITY_CREATION_MODEL") #"bedrock_claude_3_7_sonnet"
 print(f"COMMUNITY_CREATION_DEFAULT_MODEL: {COMMUNITY_CREATION_DEFAULT_MODEL}")
 
 

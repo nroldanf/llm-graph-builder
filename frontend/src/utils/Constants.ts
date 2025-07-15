@@ -60,6 +60,7 @@ export const supportedLLmsForRagas = [
   'llama4_maverick',
   'fireworks_qwen3_30b',
   'fireworks_qwen3_235b',
+  'bedrock_claude_3_7_sonnet',
 ];
 export const supportedLLmsForGroundTruthMetrics = [
   'openai_gpt_4',
@@ -77,6 +78,7 @@ export const supportedLLmsForGroundTruthMetrics = [
   'llama4_maverick',
   'fireworks_qwen3_30b',
   'fireworks_qwen3_235b',
+  'bedrock_claude_3_7_sonnet',
 ];
 export const prodllms =
   process.env.VITE_LLM_MODELS_PROD?.trim() != ''
