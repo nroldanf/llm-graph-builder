@@ -25,20 +25,28 @@ class CreateChunksofDocument:
             A list of chunks each of which is a langchain Document.
         """
         logging.info("Split file into smaller chunks")
+        logging.info(f"MYYYYY CHUNK_SIZE: {token_chunk_size}")
+        logging.info(f"MYYYYY CHUNK_OVERLAP: {chunk_overlap}")
         text_splitter = TokenTextSplitter(chunk_size=token_chunk_size, chunk_overlap=chunk_overlap)
-        MAX_TOKEN_CHUNK_SIZE = int(os.getenv('MAX_TOKEN_CHUNK_SIZE', 10000))
+        MAX_TOKEN_CHUNK_SIZE = 5242880 #int(os.getenv('MAX_TOKEN_CHUNK_SIZE', 10000))
+        logging.info("MAX_TOKEN_CHUNK_SIZE: %s", MAX_TOKEN_CHUNK_SIZE)
         chunk_to_be_created = int(MAX_TOKEN_CHUNK_SIZE / token_chunk_size)
+        logging.info("# NUMBER OF CHUNKS: %s", chunk_to_be_created)
         
         if 'page' in self.pages[0].metadata:
             chunks = []
             for i, document in enumerate(self.pages):
                 page_number = i + 1
-                if len(chunks) >= chunk_to_be_created:
-                    break
-                else:
-                    for chunk in text_splitter.split_documents([document]):
-                        chunks.append(Document(page_content=chunk.page_content, metadata={'page_number':page_number}))    
-        
+                # DON'T LIMIT THE CHUNKS
+                # if len(chunks) >= chunk_to_be_created:
+                #     break
+                # else:
+                for chunk in text_splitter.split_documents([document]):
+                    chunks.append(Document(page_content=chunk.page_content, metadata={'page_number':page_number}))    
+                    # MODIFIED
+                    # all_metadata = {'page_number':page_number, **self.pages[0].metadata}
+                    # logging.info(f"Creating chunk for page {page_number} with metadata: {all_metadata}")
+                    # chunks.append(Document(page_content=chunk.page_content, metadata=all_metadata))
         elif 'length' in self.pages[0].metadata:
             if len(self.pages) == 1  or (len(self.pages) > 1 and self.pages[1].page_content.strip() == ''): 
                 match = re.search(r'(?:v=)([0-9A-Za-z_-]{11})\s*',self.pages[0].metadata['source'])
@@ -50,6 +58,8 @@ class CreateChunksofDocument:
                 chunks = get_chunks_with_timestamps(chunks_without_time_range[:chunk_to_be_created])
         else:
             chunks = text_splitter.split_documents(self.pages)
-            
-        chunks = chunks[:chunk_to_be_created]
+        
+        # DON'T LIMIT THE CHUNKS
+        # chunks = chunks[:chunk_to_be_created]
+        logging.info(f"Total number of chunks created: {len(chunks)}")
         return chunks

@@ -12,6 +12,7 @@ from langchain_fireworks import ChatFireworks
 from langchain_aws import ChatBedrock
 from langchain_community.chat_models import ChatOllama
 import boto3
+from botocore.config import Config
 import google.auth
 from src.shared.constants import ADDITIONAL_INSTRUCTIONS
 from src.shared.llm_graph_builder_exception import LLMGraphBuilderException
@@ -93,8 +94,16 @@ def get_llm(model: str):
             session = boto3.session.Session(
                 profile_name=os.getenv("AWS_PROFILE_NAME"), 
             )
+            bedrock_config = Config(
+                retries = {
+                    'max_attempts': 30,     # Total number of attempts including the first try
+                    'mode': 'standard'      # Can be 'legacy', 'standard', or 'adaptive'
+                }
+            )
+            
             bedrock_client = session.client(
                 service_name="bedrock-runtime",
+                config=bedrock_config,
                 # region_name=region_name,
                 # aws_access_key_id=aws_access_key,
                 # aws_secret_access_key=aws_secret_key,

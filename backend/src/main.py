@@ -1,3 +1,4 @@
+import pandas as pd
 from langchain_neo4j import Neo4jGraph
 from src.shared.constants import (BUCKET_UPLOAD,BUCKET_FAILED_FILE, PROJECT_ID, QUERY_TO_GET_CHUNKS, 
                                   QUERY_TO_DELETE_EXISTING_ENTITIES, 
@@ -512,6 +513,32 @@ async def processing_chunks(chunkId_chunkDoc_list,graph,uri, userName, password,
 
 def get_chunkId_chunkDoc_list(graph, file_name, pages, token_chunk_size, chunk_overlap, retry_condition):
   if not retry_condition:
+    # HARDCODED METADATA
+    # Check metadata files exist 
+    # case_metadata_df = pd.read_excel("Test Case Metadata 7-28-25.xlsx")
+    # case_metadata_df["Filing Date"] = case_metadata_df["Filing Date"].astype(str)
+    # document_metadata_df = pd.read_excel("Test Document Metadata 7-28-25.xlsx")  
+    # document_metadata_df["Date"] = document_metadata_df["Date"].astype(str)
+    
+    # splitted = file_name.split("-")
+    # case_id = splitted[0]
+    # docket = splitted[1].replace(".txt", "").replace(".pdf", "") if len(splitted) == 2 else splitted[1]
+    # # Filter the document_metadata_df to get the row with the case_id and docket
+    # case_metadata = case_metadata_df[case_metadata_df["Case Identifier"] == case_id]
+    # # Convert the case_metadata to a dictionary
+    # case_metadata = case_metadata.to_dict(orient="records")[0]
+    # # Filter the document_metadata_df to get the row with the case_id and docket
+    # document_metadata = document_metadata_df[
+    #   (document_metadata_df["Case Identifier"] == case_id) & 
+    #   (document_metadata_df["Docket"] == int(docket))
+    # ]
+    # document_metadata = document_metadata.to_dict(orient="records")[0]
+    # # Combine the case metadata and document metadata
+    # document_metadata = {**case_metadata, **document_metadata}
+    # # Rmove Description field
+    # if 'Description' in document_metadata:
+    #   del document_metadata['Description']
+    
     logging.info("Break down file into chunks")
     bad_chars = ['"', "\n", "'"]
     for i in range(0,len(pages)):
@@ -521,7 +548,13 @@ def get_chunkId_chunkDoc_list(graph, file_name, pages, token_chunk_size, chunk_o
           text = text.replace(j, ' ')
         else:
           text = text.replace(j, '')
+      # all_metadata = pages[i].metadata
+      # combine document metadata and pages[i].metadata
+      # all_metadata.update(document_metadata)      
       pages[i]=Document(page_content=str(text), metadata=pages[i].metadata)
+      # pages[i]=Document(page_content=str(text), metadata=all_metadata)
+          
+    # logging.info(f"Document METADATA: {all_metadata}")
     create_chunks_obj = CreateChunksofDocument(pages, graph)
     chunks = create_chunks_obj.split_file_into_chunks(token_chunk_size, chunk_overlap)
     chunkId_chunkDoc_list = create_relation_between_chunks(graph,file_name,chunks)
